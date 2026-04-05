@@ -177,41 +177,43 @@ function buildTabs(){
     Object.keys(alloc).forEach(s=>alloc[s]=0);
     
 // Music player
-const tracks = ["Pista1.mp3","Pista_2.mp3","Pista_3.mp3","Pista_4.mp3"];
+const tracks = ["Pista1.mp3","Pista2.mp3","Pista3.mp3","Pista4.mp3"];
 let trackIdx = 0;
+let musicStarted = false;
 const audio = new Audio();
 audio.volume = 0.4;
 audio.loop = false;
 
-function loadTrack(idx) {
+function loadAndPlay(idx) {
   trackIdx = (idx + tracks.length) % tracks.length;
   audio.src = tracks[trackIdx];
-  document.getElementById("trackName").textContent = tracks[trackIdx];
-  audio.play().catch(()=>{});
+  document.getElementById("trackName").textContent = tracks[trackIdx].replace(".mp3","");
   document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
+  audio.load();
+  audio.play().catch(()=>{});
 }
 
-audio.addEventListener("ended", () => loadTrack(trackIdx + 1));
+audio.addEventListener("ended", () => loadAndPlay(trackIdx + 1));
 
 document.getElementById("playBtn").addEventListener("click", () => {
-  if(audio.paused) { audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
-  else { audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
+  if(!musicStarted){ musicStarted=true; loadAndPlay(0); return; }
+  if(audio.paused){ audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
+  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;&#xFE0E;"; }
 });
-document.getElementById("prevBtn").addEventListener("click", () => loadTrack(trackIdx - 1));
-document.getElementById("nextBtn").addEventListener("click", () => loadTrack(trackIdx + 1));
+document.getElementById("prevBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx - 1); });
+document.getElementById("nextBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx + 1); });
 document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
 
-// Autoplay on first user interaction
-let started = false;
-function tryStart() {
-  if(!started) { started = true; loadTrack(0); }
-  document.removeEventListener("click", tryStart);
-  document.removeEventListener("keydown", tryStart);
+// Autoplay: start on very first interaction anywhere in page
+function firstInteraction() {
+  if(!musicStarted){ musicStarted=true; loadAndPlay(0); }
+  document.removeEventListener("click", firstInteraction);
+  document.removeEventListener("touchstart", firstInteraction);
+  document.removeEventListener("keydown", firstInteraction);
 }
-document.addEventListener("click", tryStart);
-document.addEventListener("keydown", tryStart);
-// Also try immediate autoplay
-setTimeout(() => { if(!started) { started=true; loadTrack(0); } }, 300);
+document.addEventListener("click", firstInteraction);
+document.addEventListener("touchstart", firstInteraction);
+document.addEventListener("keydown", firstInteraction);
 
 buildTabs();render();
   }));
@@ -228,41 +230,43 @@ function clampAlloc(){
 }
 
 // Music player
-const tracks = ["Pista1.mp3","Pista_2.mp3","Pista_3.mp3","Pista_4.mp3"];
+const tracks = ["Pista1.mp3","Pista2.mp3","Pista3.mp3","Pista4.mp3"];
 let trackIdx = 0;
+let musicStarted = false;
 const audio = new Audio();
 audio.volume = 0.4;
 audio.loop = false;
 
-function loadTrack(idx) {
+function loadAndPlay(idx) {
   trackIdx = (idx + tracks.length) % tracks.length;
   audio.src = tracks[trackIdx];
-  document.getElementById("trackName").textContent = tracks[trackIdx];
-  audio.play().catch(()=>{});
+  document.getElementById("trackName").textContent = tracks[trackIdx].replace(".mp3","");
   document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
+  audio.load();
+  audio.play().catch(()=>{});
 }
 
-audio.addEventListener("ended", () => loadTrack(trackIdx + 1));
+audio.addEventListener("ended", () => loadAndPlay(trackIdx + 1));
 
 document.getElementById("playBtn").addEventListener("click", () => {
-  if(audio.paused) { audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
-  else { audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
+  if(!musicStarted){ musicStarted=true; loadAndPlay(0); return; }
+  if(audio.paused){ audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
+  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;&#xFE0E;"; }
 });
-document.getElementById("prevBtn").addEventListener("click", () => loadTrack(trackIdx - 1));
-document.getElementById("nextBtn").addEventListener("click", () => loadTrack(trackIdx + 1));
+document.getElementById("prevBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx - 1); });
+document.getElementById("nextBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx + 1); });
 document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
 
-// Autoplay on first user interaction
-let started = false;
-function tryStart() {
-  if(!started) { started = true; loadTrack(0); }
-  document.removeEventListener("click", tryStart);
-  document.removeEventListener("keydown", tryStart);
+// Autoplay: start on very first interaction anywhere in page
+function firstInteraction() {
+  if(!musicStarted){ musicStarted=true; loadAndPlay(0); }
+  document.removeEventListener("click", firstInteraction);
+  document.removeEventListener("touchstart", firstInteraction);
+  document.removeEventListener("keydown", firstInteraction);
 }
-document.addEventListener("click", tryStart);
-document.addEventListener("keydown", tryStart);
-// Also try immediate autoplay
-setTimeout(() => { if(!started) { started=true; loadTrack(0); } }, 300);
+document.addEventListener("click", firstInteraction);
+document.addEventListener("touchstart", firstInteraction);
+document.addEventListener("keydown", firstInteraction);
 
 buildTabs();render();
 </script>
