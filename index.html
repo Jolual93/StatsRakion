@@ -1,7 +1,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#c8a84b;--gold-bright:#f0d070;--gold-dim:#7a6030;--dark:#1a1510;--panel:#0d0a07;--border:#3d2e18;--text-dim:#7a6030;--red:#cc3333;--green:#44aa44}
-.game-wrap{background:var(--dark);font-family:var(--font-sans);padding:10px;min-height:500px}
+.game-wrap{background:var(--dark);font-family:var(--font-sans);padding:10px;min-height:0}
 .title-bar{text-align:center;color:var(--gold-bright);font-size:13px;font-weight:500;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px;letter-spacing:1px}
 .char-tabs{display:flex;gap:4px;margin-bottom:8px;justify-content:center;flex-wrap:wrap}
 .char-tab{padding:4px 10px;border:1px solid var(--border);background:var(--panel);color:var(--text-dim);font-size:11px;cursor:pointer;border-radius:3px;transition:all 0.15s}
@@ -56,6 +56,7 @@
     <div class="center-col">
       <div class="char-img-wrap"><img id="charImg" src="" alt=""></div>
       <div class="char-name-badge" id="charNameBadge">Warrior</div>
+      <div style="text-align:center;color:#7a6030;font-size:9px;letter-spacing:1px;margin-bottom:2px">NIVEL (1-99)</div>
       <div class="lvl-control">
         <button class="lvl-btn" id="lvlDown">−</button>
         <input class="lvl-input" type="number" id="lvlInput" min="1" max="99" value="1">
@@ -176,18 +177,26 @@ function buildTabs(){
     curChar=e.currentTarget.dataset.c;
     Object.keys(alloc).forEach(s=>alloc[s]=0);
     
-// Music player
+// Music player - shuffle mode
 const tracks = ["Pista1.mp3","Pista2.mp3","Pista3.mp3","Pista4.mp3"];
+let shuffled = [...tracks];
 let trackIdx = 0;
 let musicStarted = false;
 const audio = new Audio();
 audio.volume = 0.4;
 audio.loop = false;
 
+function shuffleTracks() {
+  shuffled = [...tracks].sort(() => Math.random() - 0.5);
+}
+shuffleTracks();
+
 function loadAndPlay(idx) {
-  trackIdx = (idx + tracks.length) % tracks.length;
-  audio.src = tracks[trackIdx];
-  document.getElementById("trackName").textContent = tracks[trackIdx].replace(".mp3","");
+  if(idx >= shuffled.length){ shuffleTracks(); idx = 0; }
+  if(idx < 0) idx = shuffled.length - 1;
+  trackIdx = idx;
+  audio.src = shuffled[trackIdx];
+  document.getElementById("trackName").textContent = shuffled[trackIdx].replace(".mp3","");
   document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
   audio.load();
   audio.play().catch(()=>{});
@@ -198,13 +207,12 @@ audio.addEventListener("ended", () => loadAndPlay(trackIdx + 1));
 document.getElementById("playBtn").addEventListener("click", () => {
   if(!musicStarted){ musicStarted=true; loadAndPlay(0); return; }
   if(audio.paused){ audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
-  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;&#xFE0E;"; }
+  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
 });
 document.getElementById("prevBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx - 1); });
 document.getElementById("nextBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx + 1); });
 document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
 
-// Autoplay: start on very first interaction anywhere in page
 function firstInteraction() {
   if(!musicStarted){ musicStarted=true; loadAndPlay(0); }
   document.removeEventListener("click", firstInteraction);
@@ -229,18 +237,26 @@ function clampAlloc(){
   Object.keys(alloc).forEach(s=>{alloc[s]=Math.max(0,Math.min(alloc[s],tp-used,MAX_PER_STAT));used+=alloc[s];});
 }
 
-// Music player
+// Music player - shuffle mode
 const tracks = ["Pista1.mp3","Pista2.mp3","Pista3.mp3","Pista4.mp3"];
+let shuffled = [...tracks];
 let trackIdx = 0;
 let musicStarted = false;
 const audio = new Audio();
 audio.volume = 0.4;
 audio.loop = false;
 
+function shuffleTracks() {
+  shuffled = [...tracks].sort(() => Math.random() - 0.5);
+}
+shuffleTracks();
+
 function loadAndPlay(idx) {
-  trackIdx = (idx + tracks.length) % tracks.length;
-  audio.src = tracks[trackIdx];
-  document.getElementById("trackName").textContent = tracks[trackIdx].replace(".mp3","");
+  if(idx >= shuffled.length){ shuffleTracks(); idx = 0; }
+  if(idx < 0) idx = shuffled.length - 1;
+  trackIdx = idx;
+  audio.src = shuffled[trackIdx];
+  document.getElementById("trackName").textContent = shuffled[trackIdx].replace(".mp3","");
   document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
   audio.load();
   audio.play().catch(()=>{});
@@ -251,13 +267,12 @@ audio.addEventListener("ended", () => loadAndPlay(trackIdx + 1));
 document.getElementById("playBtn").addEventListener("click", () => {
   if(!musicStarted){ musicStarted=true; loadAndPlay(0); return; }
   if(audio.paused){ audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
-  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;&#xFE0E;"; }
+  else{ audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
 });
 document.getElementById("prevBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx - 1); });
 document.getElementById("nextBtn").addEventListener("click", () => { musicStarted=true; loadAndPlay(trackIdx + 1); });
 document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
 
-// Autoplay: start on very first interaction anywhere in page
 function firstInteraction() {
   if(!musicStarted){ musicStarted=true; loadAndPlay(0); }
   document.removeEventListener("click", firstInteraction);
