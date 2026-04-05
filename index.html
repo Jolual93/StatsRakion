@@ -41,6 +41,15 @@
 
 <div class="game-wrap">
   <div class="title-bar">STATS DEL PERSONAJE</div>
+  
+  <div id="musicPlayer" style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:#0d0a07;border:1px solid #3d2e18;border-radius:3px;margin-bottom:8px">
+    <button id="prevBtn" style="background:#2a1e08;border:1px solid #7a6030;color:#c8a84b;width:20px;height:20px;border-radius:2px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">&#9664;</button>
+    <button id="playBtn" style="background:#2a1e08;border:1px solid #7a6030;color:#f0d070;width:20px;height:20px;border-radius:2px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">&#9646;&#9646;</button>
+    <button id="nextBtn" style="background:#2a1e08;border:1px solid #7a6030;color:#c8a84b;width:20px;height:20px;border-radius:2px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">&#9654;</button>
+    <span id="trackName" style="color:#c8a84b;font-size:10px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">Pista1.mp3</span>
+    <input type="range" id="volSlider" min="0" max="100" value="40" style="width:60px;accent-color:#c8a84b">
+    <span style="color:#7a6030;font-size:9px">&#9834;</span>
+  </div>
   <div class="char-tabs" id="charTabs"></div>
   <div class="main-layout">
     <div class="stats-col" id="leftStats"></div>
@@ -166,7 +175,45 @@ function buildTabs(){
   c.querySelectorAll("button").forEach(b=>b.addEventListener("click",e=>{
     curChar=e.currentTarget.dataset.c;
     Object.keys(alloc).forEach(s=>alloc[s]=0);
-    buildTabs();render();
+    
+// Music player
+const tracks = ["Pista1.mp3","Pista_2.mp3","Pista_3.mp3","Pista_4.mp3"];
+let trackIdx = 0;
+const audio = new Audio();
+audio.volume = 0.4;
+audio.loop = false;
+
+function loadTrack(idx) {
+  trackIdx = (idx + tracks.length) % tracks.length;
+  audio.src = tracks[trackIdx];
+  document.getElementById("trackName").textContent = tracks[trackIdx];
+  audio.play().catch(()=>{});
+  document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
+}
+
+audio.addEventListener("ended", () => loadTrack(trackIdx + 1));
+
+document.getElementById("playBtn").addEventListener("click", () => {
+  if(audio.paused) { audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
+  else { audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
+});
+document.getElementById("prevBtn").addEventListener("click", () => loadTrack(trackIdx - 1));
+document.getElementById("nextBtn").addEventListener("click", () => loadTrack(trackIdx + 1));
+document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
+
+// Autoplay on first user interaction
+let started = false;
+function tryStart() {
+  if(!started) { started = true; loadTrack(0); }
+  document.removeEventListener("click", tryStart);
+  document.removeEventListener("keydown", tryStart);
+}
+document.addEventListener("click", tryStart);
+document.addEventListener("keydown", tryStart);
+// Also try immediate autoplay
+setTimeout(() => { if(!started) { started=true; loadTrack(0); } }, 300);
+
+buildTabs();render();
   }));
 }
 
@@ -179,5 +226,43 @@ function clampAlloc(){
   const tp=totalPts();let used=0;
   Object.keys(alloc).forEach(s=>{alloc[s]=Math.max(0,Math.min(alloc[s],tp-used,MAX_PER_STAT));used+=alloc[s];});
 }
+
+// Music player
+const tracks = ["Pista1.mp3","Pista_2.mp3","Pista_3.mp3","Pista_4.mp3"];
+let trackIdx = 0;
+const audio = new Audio();
+audio.volume = 0.4;
+audio.loop = false;
+
+function loadTrack(idx) {
+  trackIdx = (idx + tracks.length) % tracks.length;
+  audio.src = tracks[trackIdx];
+  document.getElementById("trackName").textContent = tracks[trackIdx];
+  audio.play().catch(()=>{});
+  document.getElementById("playBtn").innerHTML = "&#9646;&#9646;";
+}
+
+audio.addEventListener("ended", () => loadTrack(trackIdx + 1));
+
+document.getElementById("playBtn").addEventListener("click", () => {
+  if(audio.paused) { audio.play(); document.getElementById("playBtn").innerHTML="&#9646;&#9646;"; }
+  else { audio.pause(); document.getElementById("playBtn").innerHTML="&#9654;"; }
+});
+document.getElementById("prevBtn").addEventListener("click", () => loadTrack(trackIdx - 1));
+document.getElementById("nextBtn").addEventListener("click", () => loadTrack(trackIdx + 1));
+document.getElementById("volSlider").addEventListener("input", e => audio.volume = e.target.value / 100);
+
+// Autoplay on first user interaction
+let started = false;
+function tryStart() {
+  if(!started) { started = true; loadTrack(0); }
+  document.removeEventListener("click", tryStart);
+  document.removeEventListener("keydown", tryStart);
+}
+document.addEventListener("click", tryStart);
+document.addEventListener("keydown", tryStart);
+// Also try immediate autoplay
+setTimeout(() => { if(!started) { started=true; loadTrack(0); } }, 300);
+
 buildTabs();render();
 </script>
